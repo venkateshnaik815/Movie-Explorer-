@@ -1,0 +1,36 @@
+export const GENRE_MAP = {
+  28: { name: 'Action', emoji: '💥', color: '#ef4444' },
+  12: { name: 'Adventure', emoji: '🗺️', color: '#f59e0b' },
+  16: { name: 'Animation', emoji: '🎨', color: '#8b5cf6' },
+  35: { name: 'Comedy', emoji: '😂', color: '#10b981' },
+  80: { name: 'Crime', emoji: '🔪', color: '#6b7280' },
+  99: { name: 'Documentary', emoji: '📹', color: '#3b82f6' },
+  18: { name: 'Drama', emoji: '🎭', color: '#ec4899' },
+  10751: { name: 'Family', emoji: '👨‍👩‍👧‍👦', color: '#f97316' },
+  14: { name: 'Fantasy', emoji: '🧙', color: '#a855f7' },
+  36: { name: 'History', emoji: '📜', color: '#78716c' },
+  27: { name: 'Horror', emoji: '👻', color: '#dc2626' },
+  10402: { name: 'Music', emoji: '🎵', color: '#06b6d4' },
+  9648: { name: 'Mystery', emoji: '🔍', color: '#6366f1' },
+  10749: { name: 'Romance', emoji: '💕', color: '#f43f5e' },
+  878: { name: 'Science Fiction', emoji: '🚀', color: '#14b8a6' },
+  10770: { name: 'TV Movie', emoji: '📺', color: '#64748b' },
+  53: { name: 'Thriller', emoji: '😱', color: '#b91c1c' },
+  10752: { name: 'War', emoji: '⚔️', color: '#854d0e' },
+  37: { name: 'Western', emoji: '🤠', color: '#a16207' },
+}
+
+export const SORT_OPTIONS = [
+  { value: 'popularity.desc', label: 'Most Popular' },
+  { value: 'vote_average.desc', label: 'Highest Rated' },
+  { value: 'release_date.desc', label: 'Newest First' },
+  { value: 'release_date.asc', label: 'Oldest First' },
+  { value: 'revenue.desc', label: 'Highest Revenue' },
+  { value: 'original_title.asc', label: 'Title A-Z' },
+]
+
+export const PAGINATION = {
+  DEFAULT_PAGE: 1,
+  MOVIES_PER_PAGE: 20,
+  MAX_PAGES: 500,
+}
