@@ -215,6 +215,10 @@ input, select, textarea {
   50% { transform: scale(1.15); }
 }
 
+.mobile-header-tabs {
+  display: none;
+}
+
 .mobile-menu-btn {
   display: none;
   flex-direction: column;
@@ -2204,7 +2208,17 @@ input, select, textarea {
 
 @media (max-width: 768px) {
   :root {
-    --header-height: 64px;
+    --header-height: 104px;
+  }
+
+  .header {
+    height: auto;
+    min-height: var(--header-height);
+  }
+
+  .header-inner {
+    height: 56px;
+    padding: 0 1rem;
   }
 
   .header-nav {
@@ -2216,7 +2230,51 @@ input, select, textarea {
   }
 
   .header-logo-img {
-    height: 38px;
+    height: 36px;
+  }
+
+  /* Website Category Chips on Mobile View - Exact website navigation visible directly on mobile */
+  .mobile-header-tabs {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0 0.85rem 0.55rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .mobile-header-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-tab-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-full);
+    background: rgba(22, 27, 34, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-text-secondary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+  }
+
+  .mobile-tab-pill:hover {
+    color: #fff;
+    border-color: rgba(255, 107, 0, 0.4);
+  }
+
+  .mobile-tab-pill.active {
+    background: var(--gradient-accent);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 2px 10px rgba(255, 107, 0, 0.35);
   }
 
   .page-container {
@@ -2224,17 +2282,52 @@ input, select, textarea {
   }
 
   .hero {
-    min-height: 65vh;
-    padding: 3rem 1rem;
+    min-height: 68vh;
+    padding: 3.5rem 1rem 2.5rem;
+  }
+
+  .hero-netflix-backdrop-img {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center 20%;
+    transform: scale(1.02);
+    opacity: 0.92;
   }
 
   .hero-logo {
     height: 64px;
+    margin-bottom: 1rem;
   }
 
+  .hero h1 {
+    font-size: clamp(2rem, 7vw, 2.75rem);
+    line-height: 1.15;
+    margin-bottom: 0.85rem;
+  }
+
+  .hero p {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin-bottom: 1.6rem;
+    padding: 0 0.25rem;
+  }
+
+  /* Exact horizontal pill badge on mobile, wrapped cleanly */
   .hero-stats {
-    gap: 1rem;
-    flex-direction: column;
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.65rem 1.15rem;
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--radius-full);
+  }
+
+  .hero-stat {
+    font-size: 0.82rem;
   }
 
   .movie-detail-backdrop {
@@ -2272,6 +2365,11 @@ input, select, textarea {
     gap: 1rem;
   }
 
+  .cricket-videos-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
   .sports-grid {
     grid-template-columns: 1fr;
   }
@@ -2294,6 +2392,22 @@ input, select, textarea {
   .footer-bottom {
     flex-direction: column;
     text-align: center;
+  }
+
+  .full-movie-modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .full-movie-top-bar {
+    padding: 0.75rem 1rem;
+  }
+
+  .full-movie-title-info h2 {
+    font-size: 1.1rem;
+  }
+
+  .full-movie-bottom-bar {
+    padding: 0.75rem 1rem;
   }
 }
 

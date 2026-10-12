@@ -96,6 +96,29 @@ export function Header() {
             <span />
           </button>
         </div>
+
+        {/* Mobile Category Navigation Strip - shows exact website categories on mobile */}
+        <nav className="mobile-header-tabs" aria-label="Mobile Navigation">
+          {NAV_LINKS.map(({ path, label, icon }) => {
+            const Icon = iconMap[icon]
+            return (
+              <NavLink
+                key={path}
+                to={path}
+                className={({ isActive }) =>
+                  `mobile-tab-pill ${isActive ? 'active' : ''}`
+                }
+                end={path === '/'}
+              >
+                {Icon && <Icon size={14} />}
+                <span>{label}</span>
+                {icon === 'heart' && count > 0 && (
+                  <span className="nav-badge">{count}</span>
+                )}
+              </NavLink>
+            )
+          })}
+        </nav>
       </header>
 
       {/* Full-Screen Mobile Drawer - Rendered outside <header> so it is NEVER behind anything */}
