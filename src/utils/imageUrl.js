@@ -23,6 +23,9 @@ export const IMAGE_SIZES = {
 
 export function getImageUrl(path, size = 'w500') {
   if (!path) return null
+  if (path.startsWith('http') || path.startsWith('data:') || path.startsWith('/prabhas')) {
+    return path
+  }
   return `${IMAGE_BASE}/${size}${path}`
 }
 
