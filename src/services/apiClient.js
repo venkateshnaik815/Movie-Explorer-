@@ -34,6 +34,8 @@ class ApiClient {
         ...fetchOptions,
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
           ...fetchOptions.headers,
         },
         body: body ? JSON.stringify(body) : undefined,

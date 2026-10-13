@@ -7,7 +7,7 @@ import os
 import json
 import time
 from datetime import datetime
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, redirect
 from flask_cors import CORS
 from database import (
     init_db,
@@ -30,6 +30,33 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Ensure SQLite database is initialized and seeded on startup
 init_db()
+
+
+@app.before_request
+def redirect_browser_api_navigation():
+    """
+    If a user opens an /api/* URL directly in the browser tab (Accept: text/html),
+    redirect them to the visual React UI page instead of showing raw JSON.
+    """
+    if request.path.startswith("/api/"):
+        accept = request.headers.get("Accept", "")
+        is_xhr = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+        if "text/html" in accept and not is_xhr:
+            if "telugu" in request.path:
+                return redirect("/telugu")
+            if "english" in request.path:
+                return redirect("/english")
+            if "sports" in request.path:
+                return redirect("/sports")
+            if "favorites" in request.path:
+                return redirect("/favorites")
+            if "uploads" in request.path:
+                return redirect("/uploads")
+            if "genres" in request.path:
+                return redirect("/genres")
+            if "search" in request.path:
+                return redirect("/search")
+            return redirect("/")
 
 
 def paginate_list(items, page=1, page_size=20):
