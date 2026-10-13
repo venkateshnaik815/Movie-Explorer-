@@ -1,5 +1,12 @@
-import { tmdbClient } from './apiClient'
-import { MOCK_MOVIES, MOCK_TELUGU_MOVIES, MOCK_NEW_RELEASES_2025_2026, MOCK_ENGLISH_MOVIES } from './mockData'
+import { tmdbClient, flaskClient } from './apiClient'
+import {
+  MOCK_MOVIES,
+  MOCK_TELUGU_MOVIES,
+  MOCK_NEW_RELEASES_2025_2026,
+  MOCK_ENGLISH_MOVIES,
+  MOCK_SPORTS,
+  MOCK_CRICKET_VIDEOS,
+} from './mockData'
 
 const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY || ''
 
@@ -16,8 +23,19 @@ function getMockPaginated(movies, page = 1, pageSize = 20) {
 }
 
 export const tmdbApi = {
-  // English Movies
+  // Flask Backend Health Check
+  checkHealth: async () => {
+    return await flaskClient.get('/health')
+  },
+
+  // English Movies (Linked to Flask /api/movies/english)
   getEnglishMovies: async (page = 1) => {
+    try {
+      const data = await flaskClient.get('/movies/english', { page })
+      if (data?.results?.length > 0) return data
+    } catch {
+      // Fallback to TMDB or local catalog
+    }
     if (!TMDB_API_KEY) {
       return getMockPaginated(MOCK_ENGLISH_MOVIES, page)
     }
@@ -37,13 +55,25 @@ export const tmdbApi = {
     }
   },
 
-  // New 2025 & 2026 Releases
+  // New 2025 & 2026 Releases (Linked to Flask /api/movies/new-releases)
   getNewReleases: async (page = 1) => {
+    try {
+      const data = await flaskClient.get('/movies/new-releases', { page })
+      if (data?.results?.length > 0) return data
+    } catch {
+      // Fallback to local catalog
+    }
     return getMockPaginated(MOCK_NEW_RELEASES_2025_2026, page)
   },
 
-  // Telugu Movies
+  // Telugu Movies (Linked to Flask /api/movies/telugu)
   getTeluguMovies: async (page = 1) => {
+    try {
+      const data = await flaskClient.get('/movies/telugu', { page })
+      if (data?.results?.length > 0) return data
+    } catch {
+      // Fallback to TMDB or local catalog
+    }
     if (!TMDB_API_KEY) {
       return getMockPaginated(MOCK_TELUGU_MOVIES, page)
     }
@@ -63,8 +93,14 @@ export const tmdbApi = {
     }
   },
 
-  // Movies
+  // Trending Movies (Linked to Flask /api/movies/trending)
   getTrending: async (timeWindow = 'week', page = 1) => {
+    try {
+      const data = await flaskClient.get('/movies/trending', { time_window: timeWindow, page })
+      if (data?.results?.length > 0) return data
+    } catch {
+      // Fallback
+    }
     if (!TMDB_API_KEY) return getMockPaginated(MOCK_MOVIES, page)
     try {
       return await tmdbClient.get(`/trending/movie/${timeWindow}`, { page })
@@ -73,7 +109,14 @@ export const tmdbApi = {
     }
   },
 
+  // Popular Movies (Linked to Flask /api/movies/popular)
   getPopular: async (page = 1) => {
+    try {
+      const data = await flaskClient.get('/movies/popular', { page })
+      if (data?.results?.length > 0) return data
+    } catch {
+      // Fallback
+    }
     if (!TMDB_API_KEY) return getMockPaginated(MOCK_MOVIES, page)
     try {
       return await tmdbClient.get('/movie/popular', { page })
@@ -82,7 +125,14 @@ export const tmdbApi = {
     }
   },
 
+  // Top Rated Movies (Linked to Flask /api/movies/top-rated)
   getTopRated: async (page = 1) => {
+    try {
+      const data = await flaskClient.get('/movies/top-rated', { page })
+      if (data?.results?.length > 0) return data
+    } catch {
+      // Fallback
+    }
     if (!TMDB_API_KEY) {
       const sorted = [...MOCK_MOVIES].sort((a, b) => b.vote_average - a.vote_average)
       return getMockPaginated(sorted, page)
@@ -95,7 +145,14 @@ export const tmdbApi = {
     }
   },
 
+  // Upcoming Movies (Linked to Flask /api/movies/upcoming)
   getUpcoming: async (page = 1) => {
+    try {
+      const data = await flaskClient.get('/movies/upcoming', { page })
+      if (data?.results?.length > 0) return data
+    } catch {
+      // Fallback
+    }
     if (!TMDB_API_KEY) {
       const sorted = [...MOCK_MOVIES].sort((a, b) => new Date(b.release_date) - new Date(a.release_date))
       return getMockPaginated(sorted, page)
@@ -107,7 +164,14 @@ export const tmdbApi = {
     }
   },
 
+  // Now Playing Movies (Linked to Flask /api/movies/now-playing)
   getNowPlaying: async (page = 1) => {
+    try {
+      const data = await flaskClient.get('/movies/now-playing', { page })
+      if (data?.results?.length > 0) return data
+    } catch {
+      // Fallback
+    }
     if (!TMDB_API_KEY) return getMockPaginated(MOCK_MOVIES, page)
     try {
       return await tmdbClient.get('/movie/now_playing', { page })
@@ -116,7 +180,14 @@ export const tmdbApi = {
     }
   },
 
+  // Movie Details (Linked to Flask /api/movies/:id)
   getMovieDetails: async (movieId) => {
+    try {
+      const data = await flaskClient.get(`/movies/${movieId}`)
+      if (data && data.id) return data
+    } catch {
+      // Fallback
+    }
     const id = Number(movieId)
     const mockMatch = MOCK_MOVIES.find((m) => m.id === id)
 
@@ -124,21 +195,30 @@ export const tmdbApi = {
       const movie = mockMatch || MOCK_MOVIES[0]
       return {
         ...movie,
-        similar: { results: MOCK_MOVIES.filter((m) => m.id !== movie.id) }
+        similar: { results: MOCK_MOVIES.filter((m) => m.id !== movie.id) },
       }
     }
     try {
-      return await tmdbClient.get(`/movie/${movieId}`, { append_to_response: 'credits,videos,similar,recommendations' })
+      return await tmdbClient.get(`/movie/${movieId}`, {
+        append_to_response: 'credits,videos,similar,recommendations',
+      })
     } catch {
       const movie = mockMatch || MOCK_MOVIES[0]
       return {
         ...movie,
-        similar: { results: MOCK_MOVIES.filter((m) => m.id !== movie.id) }
+        similar: { results: MOCK_MOVIES.filter((m) => m.id !== movie.id) },
       }
     }
   },
 
+  // Movie Credits (Linked to Flask /api/movies/:id/credits)
   getMovieCredits: async (movieId) => {
+    try {
+      const data = await flaskClient.get(`/movies/${movieId}/credits`)
+      if (data && data.cast) return data
+    } catch {
+      // Fallback
+    }
     const mockMatch = MOCK_MOVIES.find((m) => m.id === Number(movieId))
     if (!TMDB_API_KEY) {
       const movie = mockMatch || MOCK_MOVIES[0]
@@ -152,7 +232,14 @@ export const tmdbApi = {
     }
   },
 
+  // Movie Videos (Linked to Flask /api/movies/:id/videos)
   getMovieVideos: async (movieId) => {
+    try {
+      const data = await flaskClient.get(`/movies/${movieId}/videos`)
+      if (data && data.results) return data
+    } catch {
+      // Fallback
+    }
     const mockMatch = MOCK_MOVIES.find((m) => m.id === Number(movieId))
     if (!TMDB_API_KEY) {
       const movie = mockMatch || MOCK_MOVIES[0]
@@ -166,7 +253,14 @@ export const tmdbApi = {
     }
   },
 
+  // Similar Movies (Linked to Flask /api/movies/:id/similar)
   getSimilarMovies: async (movieId, page = 1) => {
+    try {
+      const data = await flaskClient.get(`/movies/${movieId}/similar`, { page })
+      if (data?.results) return data
+    } catch {
+      // Fallback
+    }
     if (!TMDB_API_KEY) {
       const filtered = MOCK_MOVIES.filter((m) => m.id !== Number(movieId))
       return getMockPaginated(filtered, page)
@@ -179,12 +273,18 @@ export const tmdbApi = {
     }
   },
 
-  // Search
+  // Search Movies (Linked to Flask /api/movies/search)
   searchMovies: async (query, page = 1) => {
+    try {
+      const data = await flaskClient.get('/movies/search', { query, page })
+      if (data && Array.isArray(data.results)) return data
+    } catch {
+      // Fallback
+    }
     if (!TMDB_API_KEY) {
       const q = (query || '').toLowerCase().trim()
-      const filtered = MOCK_MOVIES.filter((m) =>
-        m.title.toLowerCase().includes(q) || m.overview.toLowerCase().includes(q)
+      const filtered = MOCK_MOVIES.filter(
+        (m) => m.title.toLowerCase().includes(q) || m.overview.toLowerCase().includes(q)
       )
       return getMockPaginated(filtered, page)
     }
@@ -192,15 +292,21 @@ export const tmdbApi = {
       return await tmdbClient.get('/search/movie', { query, page, include_adult: false })
     } catch {
       const q = (query || '').toLowerCase().trim()
-      const filtered = MOCK_MOVIES.filter((m) =>
-        m.title.toLowerCase().includes(q) || m.overview.toLowerCase().includes(q)
+      const filtered = MOCK_MOVIES.filter(
+        (m) => m.title.toLowerCase().includes(q) || m.overview.toLowerCase().includes(q)
       )
       return getMockPaginated(filtered, page)
     }
   },
 
-  // Genres
+  // Genres (Linked to Flask /api/genres)
   getGenres: async () => {
+    try {
+      const data = await flaskClient.get('/genres')
+      if (data?.genres) return data
+    } catch {
+      // Fallback
+    }
     if (!TMDB_API_KEY) {
       return {
         genres: [
@@ -212,7 +318,7 @@ export const tmdbApi = {
           { id: 18, name: 'Drama' },
           { id: 878, name: 'Science Fiction' },
           { id: 53, name: 'Thriller' },
-        ]
+        ],
       }
     }
     try {
@@ -228,12 +334,23 @@ export const tmdbApi = {
           { id: 18, name: 'Drama' },
           { id: 878, name: 'Science Fiction' },
           { id: 53, name: 'Thriller' },
-        ]
+        ],
       }
     }
   },
 
+  // Movies by Genre (Linked to Flask /api/movies/discover)
   getMoviesByGenre: async (genreId, page = 1, sortBy = 'popularity.desc') => {
+    try {
+      const data = await flaskClient.get('/movies/discover', {
+        with_genres: genreId,
+        page,
+        sort_by: sortBy,
+      })
+      if (data?.results?.length > 0) return data
+    } catch {
+      // Fallback
+    }
     if (!TMDB_API_KEY) {
       const gid = Number(genreId)
       let filtered = MOCK_MOVIES.filter((m) => m.genre_ids?.includes(gid))
@@ -255,8 +372,14 @@ export const tmdbApi = {
     }
   },
 
-  // Discover
+  // Discover Movies (Linked to Flask /api/movies/discover)
   discoverMovies: async (params = {}) => {
+    try {
+      const data = await flaskClient.get('/movies/discover', params)
+      if (data?.results?.length > 0) return data
+    } catch {
+      // Fallback
+    }
     if (!TMDB_API_KEY) {
       return getMockPaginated(MOCK_MOVIES, params.page || 1)
     }
@@ -264,6 +387,89 @@ export const tmdbApi = {
       return await tmdbClient.get('/discover/movie', { include_adult: false, ...params })
     } catch {
       return getMockPaginated(MOCK_MOVIES, params.page || 1)
+    }
+  },
+
+  // Sports Matches & Cricket Videos (Linked to Flask /api/sports/*)
+  getSportsMatches: async () => {
+    try {
+      const data = await flaskClient.get('/sports/matches')
+      if (data?.results) return data.results
+    } catch {
+      // Fallback
+    }
+    return MOCK_SPORTS
+  },
+
+  getCricketVideos: async () => {
+    try {
+      const data = await flaskClient.get('/sports/videos')
+      if (data?.results) return data.results
+    } catch {
+      // Fallback
+    }
+    return MOCK_CRICKET_VIDEOS
+  },
+
+  // Favorites API (Linked to Flask /api/favorites)
+  getFavorites: async () => {
+    try {
+      const data = await flaskClient.get('/favorites')
+      if (data?.results) return data.results
+    } catch {
+      // Fallback handled by localStorage
+    }
+    return null
+  },
+
+  syncFavorite: async (movie, action = 'toggle') => {
+    try {
+      return await flaskClient.post('/favorites', { ...movie, action })
+    } catch {
+      return null
+    }
+  },
+
+  deleteFavoriteFromBackend: async (movieId) => {
+    try {
+      return await flaskClient.delete(`/favorites/${movieId}`)
+    } catch {
+      return null
+    }
+  },
+
+  clearFavoritesFromBackend: async () => {
+    try {
+      return await flaskClient.delete('/favorites')
+    } catch {
+      return null
+    }
+  },
+
+  // Media Uploads API (Linked to Flask /api/uploads)
+  getUploads: async () => {
+    try {
+      const data = await flaskClient.get('/uploads')
+      if (data?.results) return data.results
+    } catch {
+      // Fallback handled by localStorage
+    }
+    return null
+  },
+
+  createUpload: async (uploadData) => {
+    try {
+      return await flaskClient.post('/uploads', uploadData)
+    } catch {
+      return null
+    }
+  },
+
+  deleteUpload: async (uploadId) => {
+    try {
+      return await flaskClient.delete(`/uploads/${uploadId}`)
+    } catch {
+      return null
     }
   },
 }

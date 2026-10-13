@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { PageContainer } from '../components/layout/PageContainer'
 import { TrailerModal } from '../components/movie/TrailerModal'
 import { MOCK_SPORTS, MOCK_CRICKET_VIDEOS } from '../services/mockData'
+import { tmdbApi } from '../services/tmdbApi'
 import {
   HiTrophy,
   HiFire,
@@ -15,14 +16,25 @@ import {
 
 export default function Sports() {
   useDocumentTitle('Live Sports & Cricket Highlights')
+  const [matches, setMatches] = useState(MOCK_SPORTS)
+  const [cricketVideos, setCricketVideos] = useState(MOCK_CRICKET_VIDEOS)
   const [selectedCategory, setSelectedCategory] = useState('All Cricket')
   const [selectedStatus, setSelectedStatus] = useState('All')
   const [activeVideo, setActiveVideo] = useState(null)
 
+  useEffect(() => {
+    tmdbApi.getSportsMatches().then((data) => {
+      if (Array.isArray(data) && data.length > 0) setMatches(data)
+    })
+    tmdbApi.getCricketVideos().then((data) => {
+      if (Array.isArray(data) && data.length > 0) setCricketVideos(data)
+    })
+  }, [])
+
   const categories = ['All Cricket', 'IPL 2026', 'International']
   const statusList = ['All', 'LIVE', 'UPCOMING', 'FINISHED']
 
-  const filteredMatches = MOCK_SPORTS.filter((match) => {
+  const filteredMatches = matches.filter((match) => {
     const matchCat =
       selectedCategory === 'All Cricket' ||
       (selectedCategory === 'IPL 2026' && match.tournament.includes('IPL')) ||
@@ -70,7 +82,7 @@ export default function Sports() {
         </div>
 
         <div className="cricket-videos-grid">
-          {MOCK_CRICKET_VIDEOS.map((video) => (
+          {cricketVideos.map((video) => (
             <div
               key={video.id}
               className="cricket-video-card"

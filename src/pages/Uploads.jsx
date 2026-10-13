@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { PageContainer } from '../components/layout/PageContainer'
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { tmdbApi } from '../services/tmdbApi'
 import { HiArrowUpTray, HiFilm, HiCheck, HiTrash, HiPlay, HiDocumentText } from 'react-icons/hi2'
 
 export default function Uploads() {
@@ -28,6 +29,14 @@ export default function Uploads() {
       duration: '4:40',
     }
   ])
+
+  useEffect(() => {
+    tmdbApi.getUploads().then((backendUploads) => {
+      if (Array.isArray(backendUploads) && backendUploads.length > 0) {
+        setUploads(backendUploads)
+      }
+    })
+  }, [])
 
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState('Trailer')
@@ -74,6 +83,7 @@ export default function Uploads() {
               createdAt: new Date().toISOString().split('T')[0],
               duration: '3:00',
             }
+            tmdbApi.createUpload(newUpload)
             setUploads([newUpload, ...uploads])
             setUploading(false)
             setProgress(0)
@@ -91,6 +101,7 @@ export default function Uploads() {
   }
 
   const handleDelete = (id) => {
+    tmdbApi.deleteUpload(id)
     setUploads(uploads.filter((u) => u.id !== id))
   }
 
