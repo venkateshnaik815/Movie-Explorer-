@@ -96,22 +96,8 @@ export default function FullMoviePlayerModal({ isOpen, onClose, movie }) {
     { id: 'srv-3', name: 'Server 3 (Backup HD Mirror)' },
   ]
 
-  // Alternative server video streams for movies
-  const SERVER_ALTERNATIVES = {
-    811941: { // Devara
-      'Server 1 (Ultra HD Fast)': 'rgJsmvUa8Cc', // Official Trailer
-      'Server 2 (Cinema Cloud 4K)': 'rc61YHl1PFY', // Official Glimpse
-      'Server 3 (Backup HD Mirror)': 'A8v92v09y_U', // Fear Song Official
-    },
-    579974: { // RRR
-      'Server 1 (Ultra HD Fast)': 'f_ExquHBFXU', // Official Telugu Trailer
-      'Server 2 (Cinema Cloud 4K)': 'OsU0CGZoV8E', // Naatu Naatu Full Video Song
-      'Server 3 (Backup HD Mirror)': 'GY4BgdUSpbE', // Theatrical Trailer
-    },
-  }
-
   const baseKey = videoKey || MOVIE_VIDEO_MAP[movie.id] || 'y1-w1kUGuz8'
-  const activeKey = SERVER_ALTERNATIVES[movie.id]?.[selectedServer] || baseKey
+  const activeKey = baseKey
 
   const handleServerChange = (serverName) => {
     setSelectedServer(serverName)

@@ -29,35 +29,7 @@ export const MOCK_TELUGU_MOVIES = [
       ]
     }
   },
-  {
-    id: 811941,
-    title: 'Devara: Part 1',
-    original_language: 'te',
-    language: 'Telugu',
-    overview: 'A mighty warrior takes a stand against the criminal deeds of his village, while his mild-mannered son grows up to walk his own path in an epic coastal saga.',
-    poster_path: '/lQfuaXjANoTsdx5iS0gCXlK9D2L.jpg',
-    backdrop_path: '/hAQnXxOwCjgYcKRgTdYPRC8neqL.jpg',
-    vote_average: 7.8,
-    vote_count: 2150,
-    release_date: '2024-09-27',
-    genre_ids: [28, 18, 53],
-    genres: [{ id: 28, name: 'Action' }, { id: 18, name: 'Drama' }, { id: 53, name: 'Thriller' }],
-    runtime: 178,
-    budget: 36000000,
-    revenue: 60000000,
-    tagline: 'All Hail The Tiger.',
-    videos: {
-      results: [{ key: 'rgJsmvUa8Cc', type: 'Full Movie', site: 'YouTube' }]
-    },
-    credits: {
-      crew: [{ name: 'Koratala Siva', job: 'Director' }],
-      cast: [
-        { id: 211, name: 'N. T. Rama Rao Jr.', character: 'Devara / Vara', profile_path: '/ntr.jpg' },
-        { id: 212, name: 'Janhvi Kapoor', character: 'Thangam', profile_path: '/janhvi.jpg' },
-        { id: 213, name: 'Saif Ali Khan', character: 'Bhaira', profile_path: '/saif.jpg' }
-      ]
-    }
-  },
+
   {
     id: 857598,
     title: 'Pushpa 2: The Rule',
@@ -87,35 +59,7 @@ export const MOCK_TELUGU_MOVIES = [
       ]
     }
   },
-  {
-    id: 579974,
-    title: 'RRR',
-    original_language: 'te',
-    language: 'Telugu',
-    overview: 'A fictional tale about two legendary revolutionaries—Alluri Sitarama Raju and Komaram Bheem—and their journey away from home before they began fighting for their country in the 1920s.',
-    poster_path: '/i0Y0wP8H6SRgjr6QmuwbtQbS24D.jpg',
-    backdrop_path: '/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg',
-    vote_average: 8.7,
-    vote_count: 14500,
-    release_date: '2022-03-24',
-    genre_ids: [28, 12, 18],
-    genres: [{ id: 28, name: 'Action' }, { id: 12, name: 'Adventure' }, { id: 18, name: 'Drama' }],
-    runtime: 187,
-    budget: 66000000,
-    revenue: 160000000,
-    tagline: 'Rise. Roar. Revolt.',
-    videos: {
-      results: [{ key: 'f_ExquHBFXU', type: 'Full Movie', site: 'YouTube' }]
-    },
-    credits: {
-      crew: [{ name: 'S. S. Rajamouli', job: 'Director' }],
-      cast: [
-        { id: 231, name: 'N. T. Rama Rao Jr.', character: 'Komaram Bheem', profile_path: '/ntr.jpg' },
-        { id: 232, name: 'Ram Charan', character: 'Alluri Sitarama Raju', profile_path: '/ramcharan.jpg' },
-        { id: 233, name: 'Alia Bhatt', character: 'Sita', profile_path: '/alia.jpg' }
-      ]
-    }
-  },
+
   {
     id: 770906,
     title: 'Salaar: Part 1 – Ceasefire',
@@ -663,9 +607,7 @@ export const MOCK_SPORTS = [
 
 export const MOVIE_VIDEO_MAP = {
   1159302: 'y1-w1kUGuz8', // Kalki 2898 AD
-  811941: 'rgJsmvUa8Cc',  // Devara: Part 1 (Official Telugu Trailer)
   857598: 'g3JUbgOHgdw',  // Pushpa 2: The Rule
-  579974: 'f_ExquHBFXU',  // RRR (Official Telugu Trailer)
   770906: 'bUR_FKt7Iso',  // Salaar: Part 1 – Ceasefire
   878201: 'ZGaVFwbZNxs',  // DJ Tillu
   811944: 'QSu9-DBjMPI',  // Game Changer
