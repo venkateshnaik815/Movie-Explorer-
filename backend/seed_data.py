@@ -50,7 +50,7 @@ TELUGU_MOVIES = [
         "budget": 36000000,
         "revenue": 60000000,
         "tagline": "All Hail The Tiger.",
-        "videos": {"results": [{"key": "5cx7rvMvAWo", "type": "Full Movie", "site": "YouTube"}]},
+        "videos": {"results": [{"key": "rgJsmvUa8Cc", "type": "Full Movie", "site": "YouTube"}]},
         "credits": {
             "crew": [{"name": "Koratala Siva", "job": "Director"}],
             "cast": [
@@ -106,7 +106,7 @@ TELUGU_MOVIES = [
         "budget": 66000000,
         "revenue": 160000000,
         "tagline": "Rise. Roar. Revolt.",
-        "videos": {"results": [{"key": "NgBoMJy386M", "type": "Full Movie", "site": "YouTube"}]},
+        "videos": {"results": [{"key": "f_ExquHBFXU", "type": "Full Movie", "site": "YouTube"}]},
         "credits": {
             "crew": [{"name": "S. S. Rajamouli", "job": "Director"}],
             "cast": [

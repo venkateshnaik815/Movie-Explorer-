@@ -47,7 +47,7 @@ export const MOCK_TELUGU_MOVIES = [
     revenue: 60000000,
     tagline: 'All Hail The Tiger.',
     videos: {
-      results: [{ key: '5cx7rvMvAWo', type: 'Full Movie', site: 'YouTube' }]
+      results: [{ key: 'rgJsmvUa8Cc', type: 'Full Movie', site: 'YouTube' }]
     },
     credits: {
       crew: [{ name: 'Koratala Siva', job: 'Director' }],
@@ -105,7 +105,7 @@ export const MOCK_TELUGU_MOVIES = [
     revenue: 160000000,
     tagline: 'Rise. Roar. Revolt.',
     videos: {
-      results: [{ key: 'NgBoMJy386M', type: 'Full Movie', site: 'YouTube' }]
+      results: [{ key: 'f_ExquHBFXU', type: 'Full Movie', site: 'YouTube' }]
     },
     credits: {
       crew: [{ name: 'S. S. Rajamouli', job: 'Director' }],
@@ -663,9 +663,9 @@ export const MOCK_SPORTS = [
 
 export const MOVIE_VIDEO_MAP = {
   1159302: 'y1-w1kUGuz8', // Kalki 2898 AD
-  811941: '5cx7rvMvAWo',  // Devara: Part 1
+  811941: 'rgJsmvUa8Cc',  // Devara: Part 1 (Official Telugu Trailer)
   857598: 'g3JUbgOHgdw',  // Pushpa 2: The Rule
-  579974: 'NgBoMJy386M',  // RRR
+  579974: 'f_ExquHBFXU',  // RRR (Official Telugu Trailer)
   770906: 'bUR_FKt7Iso',  // Salaar: Part 1 – Ceasefire
   878201: 'ZGaVFwbZNxs',  // DJ Tillu
   811944: 'QSu9-DBjMPI',  // Game Changer
