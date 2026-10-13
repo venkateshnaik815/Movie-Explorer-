@@ -23,7 +23,11 @@ export const IMAGE_SIZES = {
 
 export function getImageUrl(path, size = 'w500') {
   if (!path) return null
-  if (path.startsWith('http') || path.startsWith('data:') || path.startsWith('/prabhas')) {
+  if (path.startsWith('http') || path.startsWith('data:') || path.startsWith('/') && !path.startsWith('//') && (path.endsWith('.jpg') || path.endsWith('.png') || path.endsWith('.svg') || path.endsWith('.webp')) && !path.includes('w500') && !path.includes('w1280')) {
+    // If it's a TMDB hash like /o8XSR1SONnjcsv84NRu6Mwsl5io.jpg
+    if (path.length > 25 && !path.includes('backdrop') && !path.includes('prabhas')) {
+      return `${IMAGE_BASE}/${size}${path}`
+    }
     return path
   }
   return `${IMAGE_BASE}/${size}${path}`

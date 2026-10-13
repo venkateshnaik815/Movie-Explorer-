@@ -6,7 +6,7 @@ export const MOCK_TELUGU_MOVIES = [
     language: 'Telugu',
     overview: 'Set in a post-apocalyptic world in the year 2898 AD, a modern-day avatar of Vishnu descends to protect the world from evil forces in the city of Kasi.',
     poster_path: '/rstcAnBeCkxNQjNp3YXrF6IP1tW.jpg',
-    backdrop_path: '/euYIWhGvVOE6alqqusbuowYKfdQ.jpg',
+    backdrop_path: '/kalki_backdrop.jpg',
     vote_average: 8.2,
     vote_count: 3840,
     release_date: '2024-06-27',
