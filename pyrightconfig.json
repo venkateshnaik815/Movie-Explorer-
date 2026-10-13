@@ -1,0 +1,7 @@
+{
+  "include": ["backend"],
+  "extraPaths": ["backend", "./backend"],
+  "reportMissingImports": "none",
+  "reportMissingModuleSource": "none",
+  "typeCheckingMode": "off"
+}

@@ -4,21 +4,38 @@ Links seamlessly with the React + Vite Frontend and SQLite Database.
 """
 
 import os
+import sys
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
 from flask import Flask, jsonify, request, send_from_directory, redirect
 from flask_cors import CORS
-from database import (
-    init_db,
-    get_db_connection,
-    row_to_movie,
-    row_to_match,
-    row_to_cricket_video,
-    row_to_favorite,
-    row_to_upload,
-)
-from seed_data import NEW_RELEASES_ORDER, GENRES_LIST
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+try:
+    from .database import (
+        init_db,
+        get_db_connection,
+        row_to_movie,
+        row_to_match,
+        row_to_cricket_video,
+        row_to_favorite,
+        row_to_upload,
+    )
+    from .seed_data import NEW_RELEASES_ORDER, GENRES_LIST
+except ImportError:
+    from database import (  # type: ignore
+        init_db,
+        get_db_connection,
+        row_to_movie,
+        row_to_match,
+        row_to_cricket_video,
+        row_to_favorite,
+        row_to_upload,
+    )
+    from seed_data import NEW_RELEASES_ORDER, GENRES_LIST  # type: ignore
 
 # Path to compiled frontend build directory
 FRONTEND_DIST = os.path.abspath(
@@ -57,36 +74,42 @@ def redirect_browser_api_navigation():
             if "search" in request.path:
                 return redirect("/search")
             return redirect("/")
+    return None
 
 
-def paginate_list(items, page=1, page_size=20):
-    page = max(1, int(page))
-    start = (page - 1) * page_size
-    paginated = items[start : start + page_size]
+def paginate_list(
+    items: List[Dict[str, Any]], page: int = 1, page_size: int = 20
+) -> Dict[str, Any]:
+    safe_page = max(1, int(page))
+    start = (safe_page - 1) * page_size
+    end = start + page_size
+    paginated = items[start:end]
     total_pages = max(1, (len(items) + page_size - 1) // page_size)
     return {
-        "page": page,
+        "page": safe_page,
         "results": paginated,
         "total_pages": total_pages,
         "total_results": len(items),
     }
 
 
-def sort_movies(movies, sort_by="popularity.desc"):
+def sort_movies(
+    movies: List[Dict[str, Any]], sort_by: str = "popularity.desc"
+) -> List[Dict[str, Any]]:
     if sort_by == "vote_average.desc":
-        return sorted(movies, key=lambda m: m.get("vote_average", 0), reverse=True)
-    elif sort_by == "release_date.desc":
-        return sorted(movies, key=lambda m: m.get("release_date", ""), reverse=True)
-    elif sort_by == "release_date.asc":
-        return sorted(movies, key=lambda m: m.get("release_date", ""))
-    elif sort_by == "revenue.desc":
-        return sorted(movies, key=lambda m: m.get("revenue", 0), reverse=True)
-    elif sort_by == "original_title.asc":
-        return sorted(movies, key=lambda m: m.get("title", "").lower())
+        return sorted(movies, key=lambda m: float(m.get("vote_average", 0.0)), reverse=True)
+    if sort_by == "release_date.desc":
+        return sorted(movies, key=lambda m: str(m.get("release_date", "")), reverse=True)
+    if sort_by == "release_date.asc":
+        return sorted(movies, key=lambda m: str(m.get("release_date", "")))
+    if sort_by == "revenue.desc":
+        return sorted(movies, key=lambda m: int(m.get("revenue", 0)), reverse=True)
+    if sort_by == "original_title.asc":
+        return sorted(movies, key=lambda m: str(m.get("title", "")).lower())
     return movies
 
 
-def fetch_all_movies_from_db(lang=None):
+def fetch_all_movies_from_db(lang: Optional[str] = None) -> List[Dict[str, Any]]:
     conn = get_db_connection()
     if lang:
         rows = conn.execute(
@@ -98,7 +121,12 @@ def fetch_all_movies_from_db(lang=None):
             "SELECT * FROM movies ORDER BY sort_order ASC"
         ).fetchall()
     conn.close()
-    return [row_to_movie(r) for r in rows]
+    return [row_to_movie(r) for r in rows if r is not None]
+
+
+def get_table_count(conn: Any, table_name: str) -> int:
+    row = conn.execute(f"SELECT COUNT(*) as c FROM {table_name}").fetchone()
+    return int(row["c"]) if row is not None else 0
 
 
 # ==========================================
@@ -107,10 +135,10 @@ def fetch_all_movies_from_db(lang=None):
 @app.route("/api/health", methods=["GET"])
 def health_check():
     conn = get_db_connection()
-    movie_count = conn.execute("SELECT COUNT(*) as c FROM movies").fetchone()["c"]
-    match_count = conn.execute("SELECT COUNT(*) as c FROM sports_matches").fetchone()["c"]
-    fav_count = conn.execute("SELECT COUNT(*) as c FROM favorites").fetchone()["c"]
-    upload_count = conn.execute("SELECT COUNT(*) as c FROM uploads").fetchone()["c"]
+    movie_count = get_table_count(conn, "movies")
+    match_count = get_table_count(conn, "sports_matches")
+    fav_count = get_table_count(conn, "favorites")
+    upload_count = get_table_count(conn, "uploads")
     conn.close()
 
     return jsonify({
@@ -124,7 +152,7 @@ def health_check():
             "favorites": fav_count,
             "uploads": upload_count,
         },
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     })
 
 
@@ -152,7 +180,7 @@ def get_english_movies():
 @app.route("/api/movies/new-releases", methods=["GET"])
 def get_new_releases():
     page = request.args.get("page", 1, type=int)
-    all_movies = {m["id"]: m for m in fetch_all_movies_from_db()}
+    all_movies = {int(m["id"]): m for m in fetch_all_movies_from_db()}
     ordered = [all_movies[mid] for mid in NEW_RELEASES_ORDER if mid in all_movies]
     return jsonify(paginate_list(ordered, page))
 
@@ -224,25 +252,31 @@ def search_movies():
         movies = [
             m
             for m in movies
-            if query in m["title"].lower() or query in m["overview"].lower()
+            if query in str(m.get("title", "")).lower()
+            or query in str(m.get("overview", "")).lower()
         ]
 
     return jsonify(paginate_list(movies, page))
 
 
 @app.route("/api/movies/<int:movie_id>", methods=["GET"])
-def get_movie_details(movie_id):
+def get_movie_details(movie_id: int):
     conn = get_db_connection()
     row = conn.execute("SELECT * FROM movies WHERE id = ?", (movie_id,)).fetchone()
     conn.close()
 
     all_movies = fetch_all_movies_from_db()
-    movie = row_to_movie(row) if row else (all_movies[0] if all_movies else None)
+    movie: Optional[Dict[str, Any]] = None
+    if row is not None:
+        movie = row_to_movie(row)
+    elif len(all_movies) > 0:
+        movie = all_movies[0]
 
-    if not movie:
+    if movie is None:
         return jsonify({"error": "Movie not found"}), 404
 
-    similar = [m for m in all_movies if m["id"] != movie["id"]]
+    current_id = movie.get("id")
+    similar = [m for m in all_movies if m.get("id") != current_id]
     response_data = {
         **movie,
         "similar": {"results": similar},
@@ -251,34 +285,34 @@ def get_movie_details(movie_id):
 
 
 @app.route("/api/movies/<int:movie_id>/credits", methods=["GET"])
-def get_movie_credits(movie_id):
+def get_movie_credits(movie_id: int):
     conn = get_db_connection()
     row = conn.execute("SELECT * FROM movies WHERE id = ?", (movie_id,)).fetchone()
     conn.close()
 
-    if row:
+    if row is not None:
         movie = row_to_movie(row)
         return jsonify(movie.get("credits", {"cast": [], "crew": []}))
     return jsonify({"cast": [], "crew": []})
 
 
 @app.route("/api/movies/<int:movie_id>/videos", methods=["GET"])
-def get_movie_videos(movie_id):
+def get_movie_videos(movie_id: int):
     conn = get_db_connection()
     row = conn.execute("SELECT * FROM movies WHERE id = ?", (movie_id,)).fetchone()
     conn.close()
 
-    if row:
+    if row is not None:
         movie = row_to_movie(row)
         return jsonify(movie.get("videos", {"results": []}))
     return jsonify({"results": []})
 
 
 @app.route("/api/movies/<int:movie_id>/similar", methods=["GET"])
-def get_similar_movies(movie_id):
+def get_similar_movies(movie_id: int):
     page = request.args.get("page", 1, type=int)
     all_movies = fetch_all_movies_from_db()
-    similar = [m for m in all_movies if m["id"] != movie_id]
+    similar = [m for m in all_movies if m.get("id") != movie_id]
     return jsonify(paginate_list(similar, page))
 
 
@@ -301,17 +335,17 @@ def get_sports_matches():
     ).fetchall()
     conn.close()
 
-    matches = [row_to_match(r) for r in rows]
+    matches = [row_to_match(r) for r in rows if r is not None]
 
     if category and category != "All Cricket":
         if category == "IPL 2026":
-            matches = [m for m in matches if "IPL" in m["tournament"]]
+            matches = [m for m in matches if "IPL" in str(m.get("tournament", ""))]
         elif category == "International":
-            matches = [m for m in matches if "IPL" not in m["tournament"]]
+            matches = [m for m in matches if "IPL" not in str(m.get("tournament", ""))]
 
     if status and status != "All":
         matches = [
-            m for m in matches if m["status"].upper() == status.upper()
+            m for m in matches if str(m.get("status", "")).upper() == status.upper()
         ]
 
     return jsonify({"results": matches, "total": len(matches)})
@@ -325,7 +359,7 @@ def get_cricket_videos():
     ).fetchall()
     conn.close()
 
-    videos = [row_to_cricket_video(r) for r in rows]
+    videos = [row_to_cricket_video(r) for r in rows if r is not None]
     return jsonify({"results": videos, "total": len(videos)})
 
 
@@ -339,7 +373,7 @@ def get_favorites():
         "SELECT * FROM favorites ORDER BY added_at DESC"
     ).fetchall()
     conn.close()
-    return jsonify({"results": [row_to_favorite(r) for r in rows]})
+    return jsonify({"results": [row_to_favorite(r) for r in rows if r is not None]})
 
 
 @app.route("/api/favorites", methods=["POST"])
@@ -355,7 +389,7 @@ def add_or_toggle_favorite():
     ).fetchone()
 
     action = data.get("action", "toggle")
-    if existing and action in ("toggle", "remove"):
+    if existing is not None and action in ("toggle", "remove"):
         conn.execute("DELETE FROM favorites WHERE id = ?", (movie_id,))
         conn.commit()
         conn.close()
@@ -384,7 +418,7 @@ def add_or_toggle_favorite():
 
 
 @app.route("/api/favorites/<int:movie_id>", methods=["DELETE"])
-def delete_favorite(movie_id):
+def delete_favorite(movie_id: int):
     conn = get_db_connection()
     conn.execute("DELETE FROM favorites WHERE id = ?", (movie_id,))
     conn.commit()
@@ -411,14 +445,14 @@ def get_uploads():
         "SELECT * FROM uploads ORDER BY rowid DESC"
     ).fetchall()
     conn.close()
-    return jsonify({"results": [row_to_upload(r) for r in rows]})
+    return jsonify({"results": [row_to_upload(r) for r in rows if r is not None]})
 
 
 @app.route("/api/uploads", methods=["POST"])
 def create_upload():
     data = request.get_json(silent=True) or {}
     upload_id = data.get("id") or f"upl-{int(time.time() * 1000)}"
-    title = (data.get("title") or "").strip()
+    title = str(data.get("title") or "").strip()
     if not title:
         return jsonify({"error": "Media title is required"}), 400
 
@@ -454,7 +488,7 @@ def create_upload():
 
 
 @app.route("/api/uploads/<upload_id>", methods=["DELETE"])
-def delete_upload(upload_id):
+def delete_upload(upload_id: str):
     conn = get_db_connection()
     conn.execute("DELETE FROM uploads WHERE id = ?", (upload_id,))
     conn.commit()
@@ -467,7 +501,7 @@ def delete_upload(upload_id):
 # ==========================================
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
-def serve_frontend(path):
+def serve_frontend(path: str):
     if os.path.exists(FRONTEND_DIST):
         target_path = os.path.join(FRONTEND_DIST, path)
         if path != "" and os.path.exists(target_path) and os.path.isfile(target_path):

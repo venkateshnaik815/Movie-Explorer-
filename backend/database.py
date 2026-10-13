@@ -4,27 +4,40 @@ Automatically creates tables and seeds initial catalog data on startup.
 """
 
 import os
+import sys
 import json
 import sqlite3
-from seed_data import (
-    TELUGU_MOVIES,
-    ENGLISH_MOVIES,
-    NEW_RELEASES_ORDER,
-    CRICKET_VIDEOS,
-    SPORTS_MATCHES,
-    DEFAULT_UPLOADS,
-)
+from typing import Any, Dict
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+try:
+    from .seed_data import (
+        TELUGU_MOVIES,
+        ENGLISH_MOVIES,
+        CRICKET_VIDEOS,
+        SPORTS_MATCHES,
+        DEFAULT_UPLOADS,
+    )
+except ImportError:
+    from seed_data import (  # type: ignore
+        TELUGU_MOVIES,
+        ENGLISH_MOVIES,
+        CRICKET_VIDEOS,
+        SPORTS_MATCHES,
+        DEFAULT_UPLOADS,
+    )
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "movie_explorer.db")
 
 
-def get_db_connection():
+def get_db_connection() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 
-def init_db():
+def init_db() -> None:
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -116,8 +129,8 @@ def init_db():
     """)
 
     # Seed movies if empty
-    cursor.execute("SELECT COUNT(*) as cnt FROM movies")
-    if cursor.fetchone()["cnt"] == 0:
+    movie_row = cursor.execute("SELECT COUNT(*) as cnt FROM movies").fetchone()
+    if movie_row is not None and int(movie_row["cnt"]) == 0:
         all_movies = TELUGU_MOVIES + ENGLISH_MOVIES
         for idx, m in enumerate(all_movies):
             cursor.execute("""
@@ -152,8 +165,8 @@ def init_db():
             ))
 
     # Seed sports matches if empty
-    cursor.execute("SELECT COUNT(*) as cnt FROM sports_matches")
-    if cursor.fetchone()["cnt"] == 0:
+    match_row = cursor.execute("SELECT COUNT(*) as cnt FROM sports_matches").fetchone()
+    if match_row is not None and int(match_row["cnt"]) == 0:
         for idx, s in enumerate(SPORTS_MATCHES):
             cursor.execute("""
                 INSERT OR REPLACE INTO sports_matches (
@@ -178,8 +191,8 @@ def init_db():
             ))
 
     # Seed cricket videos if empty
-    cursor.execute("SELECT COUNT(*) as cnt FROM cricket_videos")
-    if cursor.fetchone()["cnt"] == 0:
+    video_row = cursor.execute("SELECT COUNT(*) as cnt FROM cricket_videos").fetchone()
+    if video_row is not None and int(video_row["cnt"]) == 0:
         for idx, v in enumerate(CRICKET_VIDEOS):
             cursor.execute("""
                 INSERT OR REPLACE INTO cricket_videos (
@@ -199,8 +212,8 @@ def init_db():
             ))
 
     # Seed default uploads if empty
-    cursor.execute("SELECT COUNT(*) as cnt FROM uploads")
-    if cursor.fetchone()["cnt"] == 0:
+    upload_row = cursor.execute("SELECT COUNT(*) as cnt FROM uploads").fetchone()
+    if upload_row is not None and int(upload_row["cnt"]) == 0:
         for u in DEFAULT_UPLOADS:
             cursor.execute("""
                 INSERT OR REPLACE INTO uploads (
@@ -222,9 +235,7 @@ def init_db():
     conn.close()
 
 
-def row_to_movie(row):
-    if not row:
-        return None
+def row_to_movie(row: sqlite3.Row) -> Dict[str, Any]:
     return {
         "id": row["id"],
         "title": row["title"],
@@ -247,7 +258,7 @@ def row_to_movie(row):
     }
 
 
-def row_to_match(row):
+def row_to_match(row: sqlite3.Row) -> Dict[str, Any]:
     return {
         "id": row["id"],
         "sport": row["sport"],
@@ -264,7 +275,7 @@ def row_to_match(row):
     }
 
 
-def row_to_cricket_video(row):
+def row_to_cricket_video(row: sqlite3.Row) -> Dict[str, Any]:
     return {
         "id": row["id"],
         "title": row["title"],
@@ -277,7 +288,7 @@ def row_to_cricket_video(row):
     }
 
 
-def row_to_favorite(row):
+def row_to_favorite(row: sqlite3.Row) -> Dict[str, Any]:
     return {
         "id": row["id"],
         "title": row["title"],
@@ -289,7 +300,7 @@ def row_to_favorite(row):
     }
 
 
-def row_to_upload(row):
+def row_to_upload(row: sqlite3.Row) -> Dict[str, Any]:
     return {
         "id": row["id"],
         "title": row["title"],
