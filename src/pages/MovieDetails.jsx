@@ -127,10 +127,25 @@ export default function MovieDetails() {
                 <div key={person.id} className="cast-card">
                   <div className="cast-avatar">
                     {person.profile_path ? (
-                      <img src={getProfileUrl(person.profile_path, 'medium')} alt={person.name} loading="lazy" />
-                    ) : (
-                      <div className="cast-avatar-placeholder">{person.name?.charAt(0)}</div>
-                    )}
+                      <img
+                        src={getProfileUrl(person.profile_path, 'medium')}
+                        alt={person.name}
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                          const next = e.currentTarget.nextElementSibling
+                          if (next) {
+                            next.style.display = 'flex'
+                          }
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className="cast-avatar-placeholder"
+                      style={{ display: person.profile_path ? 'none' : 'flex' }}
+                    >
+                      {person.name?.charAt(0)}
+                    </div>
                   </div>
                   <h4 className="cast-name">{person.name}</h4>
                   <p className="cast-character">{person.character}</p>

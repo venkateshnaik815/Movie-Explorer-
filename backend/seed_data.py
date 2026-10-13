@@ -25,10 +25,10 @@ TELUGU_MOVIES = [
         "credits": {
             "crew": [{"name": "Nag Ashwin", "job": "Director"}],
             "cast": [
-                {"id": 201, "name": "Prabhas", "character": "Bhairava", "profile_path": "/prabhas.jpg"},
-                {"id": 202, "name": "Amitabh Bachchan", "character": "Ashwatthama", "profile_path": "/amitabh.jpg"},
-                {"id": 203, "name": "Kamal Haasan", "character": "Supreme Yaskin", "profile_path": "/kamal.jpg"},
-                {"id": 204, "name": "Deepika Padukone", "character": "SUM-80", "profile_path": "/deepika.jpg"}
+                {"id": 201, "name": "Prabhas", "character": "Bhairava", "profile_path": "/or06FN3Dka5tukK1e9sl16pB3iy.jpg"},
+                {"id": 202, "name": "Amitabh Bachchan", "character": "Ashwatthama", "profile_path": "/u69PvpWqGkywSm0YjFiw77j9eqS.jpg"},
+                {"id": 203, "name": "Kamal Haasan", "character": "Supreme Yaskin", "profile_path": "/17zscZgz4wOlGDd3Gziw4YbI3G.jpg"},
+                {"id": 204, "name": "Deepika Padukone", "character": "SUM-80", "profile_path": "/rzvvBQ0r6oiqDdzcsdTRB7jN4Rx.jpg"}
             ]
         },
         "is_new_release": False
