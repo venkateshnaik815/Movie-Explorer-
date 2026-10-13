@@ -41,7 +41,7 @@ TELUGU_MOVIES = [
         "language": "Telugu",
         "overview": "The clash between Pushpa Raj and Bhanwar Singh Shekhawat escalates into an all-out warfare as Pushpa expands his red sandalwood syndicate across international borders.",
         "poster_path": "/eUe5M3D0lLskjirOJ11R6xd7XB0.jpg",
-        "backdrop_path": "/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg",
+        "backdrop_path": "/pushpa_backdrop.jpg",
         "vote_average": 8.5,
         "vote_count": 4200,
         "release_date": "2024-12-05",
@@ -55,7 +55,7 @@ TELUGU_MOVIES = [
         "credits": {
             "crew": [{"name": "Sukumar", "job": "Director"}],
             "cast": [
-                {"id": 221, "name": "Allu Arjun", "character": "Pushpa Raj", "profile_path": "/allu.jpg"},
+                {"id": 221, "name": "Allu Arjun", "character": "Pushpa Raj", "profile_path": "/allu_arjun.jpg"},
                 {"id": 222, "name": "Rashmika Mandanna", "character": "Srivalli", "profile_path": "/rashmika.jpg"},
                 {"id": 223, "name": "Fahadh Faasil", "character": "Bhanwar Singh Shekhawat", "profile_path": "/fahadh.jpg"}
             ]
