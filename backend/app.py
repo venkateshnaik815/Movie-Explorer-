@@ -42,7 +42,7 @@ FRONTEND_DIST = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "dist")
 )
 
-app = Flask(__name__, static_folder=FRONTEND_DIST, static_url_path="")
+app = Flask(__name__, static_folder=None)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Ensure SQLite database is initialized and seeded on startup
@@ -503,9 +503,10 @@ def delete_upload(upload_id: str):
 @app.route("/<path:path>")
 def serve_frontend(path: str):
     if os.path.exists(FRONTEND_DIST):
-        target_path = os.path.join(FRONTEND_DIST, path)
-        if path != "" and os.path.exists(target_path) and os.path.isfile(target_path):
-            return send_from_directory(FRONTEND_DIST, path)
+        clean_path = path.lstrip("/")
+        target_path = os.path.join(FRONTEND_DIST, clean_path)
+        if clean_path != "" and os.path.exists(target_path) and os.path.isfile(target_path):
+            return send_from_directory(FRONTEND_DIST, clean_path)
         index_file = os.path.join(FRONTEND_DIST, "index.html")
         if os.path.exists(index_file):
             return send_from_directory(FRONTEND_DIST, "index.html")
@@ -513,27 +514,27 @@ def serve_frontend(path: str):
     return jsonify({
         "service": "Movie Explorer Flask Backend API",
         "status": "running",
-        "endpoints": [
-            "/api/health",
-            "/api/movies/telugu",
-            "/api/movies/english",
-            "/api/movies/new-releases",
-            "/api/movies/trending",
-            "/api/movies/popular",
-            "/api/movies/top-rated",
-            "/api/movies/upcoming",
-            "/api/movies/discover",
-            "/api/movies/search",
-            "/api/genres",
-            "/api/sports/matches",
-            "/api/sports/videos",
-            "/api/favorites",
-            "/api/uploads",
-        ],
     })
+
+
+@app.errorhandler(404)
+def handle_404_spa_fallback(_error: Any):
+    """
+    Guarantee that refreshing or opening any React Router URL in a new tab
+    (e.g. /movie/1159302, /telugu, /english, /sports) NEVER returns 404 Not Found.
+    """
+    if request.path.startswith("/api/"):
+        is_xhr = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+        if is_xhr:
+            return jsonify({"error": "Endpoint not found"}), 404
+
+    index_file = os.path.join(FRONTEND_DIST, "index.html")
+    if os.path.exists(index_file):
+        return send_from_directory(FRONTEND_DIST, "index.html"), 200
+    return redirect("/")
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     print(f"Starting Movie Explorer Flask Backend on http://127.0.0.1:{port}")
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port, debug=False, threaded=True)
