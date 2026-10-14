@@ -70,7 +70,7 @@ TELUGU_MOVIES = [
         "language": "Telugu",
         "overview": "Set in the fictional dystopian city-state of Khansaar, the film follows the friendship between Deva, a tribesman, and Varadha, the prince of Khansaar.",
         "poster_path": "/nlu9WbcetNFRGXXPWITr30ob7W6.jpg",
-        "backdrop_path": "/xtOCTmGemASooRkAxRorYODig1p.jpg",
+        "backdrop_path": "/salaar_backdrop.jpg",
         "vote_average": 7.6,
         "vote_count": 2800,
         "release_date": "2023-12-21",
@@ -85,7 +85,7 @@ TELUGU_MOVIES = [
             "crew": [{"name": "Prashanth Neel", "job": "Director"}],
             "cast": [
                 {"id": 241, "name": "Prabhas", "character": "Deva / Salaar", "profile_path": "/prabhas.jpg"},
-                {"id": 242, "name": "Prithviraj Sukumaran", "character": "Varadharaja Mannaar", "profile_path": "/prithvi.jpg"}
+                {"id": 242, "name": "Prithviraj Sukumaran", "character": "Varadharaja Mannaar", "profile_path": "/prithviraj.jpg"}
             ]
         },
         "is_new_release": False
